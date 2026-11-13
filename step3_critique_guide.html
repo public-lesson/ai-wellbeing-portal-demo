@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第3時 STEP 2｜AIで構想を問い直す - 公共「AI時代のウェルビーイングを考える」</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Noto Sans JP -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background-color: #f8fafc;
+      color: #1f2937;
+    }
+    .main-color-bg { background-color: #4A90E2; }
+    .main-color-text { color: #4A90E2; }
+    .accent-color-bg { background-color: #F5A623; }
+    .accent-color-text { color: #F5A623; }
+    .accent-hover:hover { background-color: #E0961F; }
+    .main-hover:hover { background-color: #3B7DC4; }
+    .smooth-transition { transition: all 0.25s ease-in-out; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased">
+
+  <!-- ==========================================
+      1. Navigation Header
+  ========================================== -->
+  <header class="sticky top-0 z-40 main-color-bg text-white shadow-md">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center shadow-inner">
+          <i data-lucide="bot" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <span class="block text-xs font-semibold tracking-wider text-yellow-300">甲南高校79期生 公民科</span>
+          <span class="block text-sm sm:text-base font-bold leading-tight">第3時 STEP 2「AIで構想を問い直す」</span>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-yellow-300"></i>
+        <span>最大3往復対話</span>
+      </span>
+    </div>
+  </header>
+
+  <!-- ==========================================
+      Main Content
+  ========================================== -->
+  <main class="flex-grow">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white px-4 py-10 md:py-12 shadow-inner">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 rounded-full border border-yellow-300/40 bg-yellow-400/10 px-4 py-1 text-xs font-bold text-yellow-300 mb-3 shadow-sm">
+          <i data-lucide="message-square" class="w-4 h-4"></i>
+          <span>前提 → 反例・見落とされた立場 → 最重要の問い</span>
+        </div>
+        <h1 class="text-2xl sm:text-4xl font-extrabold leading-tight">
+          AIとの批判的対話で構想を問い直す
+        </h1>
+        <p class="mt-2 text-sm sm:text-base text-slate-300 font-light max-w-2xl mx-auto">
+          AIに完成案を求めず、対話を通じて自分たちの案の「前提」や「見落とし」に気づき、公式資料で確かめる問いを絞り込みます。
+        </p>
+
+        <!-- ゴールボックス -->
+        <div class="mt-6 max-w-2xl mx-auto rounded-xl border-l-4 border-[#F5A623] bg-white/10 p-4 text-left backdrop-blur shadow-lg">
+          <span class="text-xs font-bold text-yellow-300 block mb-1">本ステップのゴール</span>
+          <p class="text-sm sm:text-base font-bold leading-snug text-white">
+            AIと最大3回やり取りし、公式資料で確かめる「最重要の問い」を1つに絞る。
+          </p>
+          <p class="text-xs text-slate-300 mt-1">※十分な問いが得られた場合は、1回目または2回目で終えて構いません。</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="max-w-4xl mx-auto px-4 py-8 space-y-6">
+
+      <!-- 1. 第2時の記録を短く入力 -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
+        <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
+          <span class="w-7 h-7 rounded-full main-color-bg text-white flex items-center justify-center text-xs font-black">1</span>
+          <h2 class="text-base sm:text-lg font-bold text-slate-800">第2時の記録を短く入力する</h2>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label for="caseSelect" class="block text-xs font-bold text-slate-700 mb-1">担当ケース</label>
+            <select id="caseSelect" onchange="buildStartPrompt()" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs sm:text-sm font-bold text-slate-800 focus:border-[#4A90E2] outline-none bg-white">
+              <option value="剛">剛（たけし）</option>
+              <option value="明">明（あきら）</option>
+              <option value="直">直（なお）</option>
+            </select>
+          </div>
+          <div>
+            <label for="inputEvidence" class="block text-xs font-bold text-slate-700 mb-1">公式資料で確認したこと（1文）</label>
+            <input type="text" id="inputEvidence" oninput="buildStartPrompt()" placeholder="例：口頭以外の意思表明手段が配慮として認められる" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs sm:text-sm focus:border-[#4A90E2] outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label for="inputRoutes" class="block text-xs font-bold text-slate-700 mb-1">班の構想：学習・参加経路 A・B（各1文）</label>
+          <textarea id="inputRoutes" rows="2" oninput="buildStartPrompt()" placeholder="A：チャットやGoogleスライドへの書き込みで意見を出す&#10;B：後からGoogleフォームで意見を追加する" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs sm:text-sm focus:border-[#4A90E2] outline-none"></textarea>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label for="inputUnknown" class="block text-xs font-bold text-slate-700 mb-1">資料だけでは判断できないこと（1文）</label>
+            <input type="text" id="inputUnknown" oninput="buildStartPrompt()" placeholder="例：班の中でいつ合意形成するかという時間配分" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs sm:text-sm focus:border-[#4A90E2] outline-none">
+          </div>
+          <div>
+            <label for="inputPerson" class="block text-xs font-bold text-slate-700 mb-1">本人との対話で確認すること（1文）</label>
+            <input type="text" id="inputPerson" oninput="buildStartPrompt()" placeholder="例：本人がどの方法を納得して選んでいるか" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs sm:text-sm focus:border-[#4A90E2] outline-none">
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. AIと最大3回対話する（ステップ式プロンプトUI） -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-5">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full main-color-bg text-white flex items-center justify-center text-xs font-black">2</span>
+            <h2 class="text-base sm:text-lg font-bold text-slate-800">AIと対話を深める（最大3往復）</h2>
+          </div>
+          <a href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-white accent-color-bg accent-hover px-3.5 py-1.5 rounded-lg smooth-transition flex items-center gap-1.5 shadow-sm">
+            <span>Geminiを開く</span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+
+        <!-- 1回目：前提 -->
+        <div class="rounded-xl border-2 border-blue-200 bg-blue-50/40 p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-900 bg-blue-100 px-2.5 py-0.5 rounded-full">
+              <span>第1往復</span><span>構想の前提を問う</span>
+            </span>
+            <button type="button" onclick="copyText('prompt1Display', 'copyBtn1')" id="copyBtn1" class="text-xs font-bold main-color-bg main-hover text-white px-3 py-1.5 rounded-lg smooth-transition flex items-center gap-1 shadow-sm">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>開始プロンプトをコピー</span>
+            </button>
+          </div>
+          <pre id="prompt1Display" class="whitespace-pre-wrap rounded-lg bg-white border border-blue-200 p-3 text-xs leading-relaxed text-slate-700 font-sans"></pre>
+        </div>
+
+        <!-- 2回目：反例・立場 -->
+        <div class="rounded-xl border-2 border-slate-200 bg-slate-50/70 p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-200 px-2.5 py-0.5 rounded-full">
+              <span>第2往復</span><span>反例・見落とされた立場を問う</span>
+            </span>
+            <button type="button" onclick="copyTurn2Prompt()" id="copyBtn2" class="text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg smooth-transition flex items-center gap-1 shadow-sm">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>2回目の返信文をコピー</span>
+            </button>
+          </div>
+          <p class="text-xs text-slate-600">AIからの1問目の問いに対し、班の考えを1文入力してコピーしてください：</p>
+          <div class="flex gap-2">
+            <input type="text" id="responseTurn1" placeholder="AIへの班の返答（例：話合いのスピードより、全員が納得することを大切にしたいから）" class="flex-grow rounded-lg border border-slate-300 p-2 text-xs focus:border-[#4A90E2] outline-none bg-white">
+          </div>
+        </div>
+
+        <!-- 3回目：焦点化 -->
+        <div class="rounded-xl border-2 border-slate-200 bg-slate-50/70 p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-200 px-2.5 py-0.5 rounded-full">
+              <span>第3往復</span><span>最重要の問いへ焦点化する</span>
+            </span>
+            <button type="button" onclick="copyTurn3Prompt()" id="copyBtn3" class="text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg smooth-transition flex items-center gap-1 shadow-sm">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>3回目の返信文をコピー</span>
+            </button>
+          </div>
+          <p class="text-xs text-slate-600">AIからの2問目の問いに対し、班の考えを1文入力してコピーしてください：</p>
+          <div class="flex gap-2">
+            <input type="text" id="responseTurn2" placeholder="AIへの班の返答（例：後から意見を出せても、すでに話合いが終わっていたら意味がないから）" class="flex-grow rounded-lg border border-slate-300 p-2 text-xs focus:border-[#4A90E2] outline-none bg-white">
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. 第4時へつながる最重要の問い -->
+      <section class="bg-amber-50/70 rounded-2xl border-2 border-amber-300 p-5 sm:p-6 shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-amber-200">
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full accent-color-bg text-white flex items-center justify-center text-xs font-black">3</span>
+            <h2 class="text-base sm:text-lg font-bold text-amber-950">第4時へつながる最重要の問い</h2>
+          </div>
+          <span class="text-xs font-bold text-amber-900 bg-amber-100 px-2.5 py-1 rounded-full">公式記録</span>
+        </div>
+
+        <div class="rounded-xl border border-amber-200 bg-white p-3.5 text-xs text-amber-900 leading-relaxed">
+          <strong>最重要の問いだけを記録します。</strong> AIの発言全文や3往復の履歴はスライドへ貼り付けません。AIが示した問いを班で吟味し、必要に応じて自分たちの言葉に書き換えてください。
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label for="finalQuestion" class="block text-xs font-bold text-slate-800">最重要の問い（80字以内）</label>
+            <span id="charCount" class="text-[11px] font-bold text-slate-400">0 / 80字</span>
+          </div>
+          <textarea id="finalQuestion" rows="2" maxlength="80" oninput="updateCharCount()" placeholder="例：書面や後からの意見提出は、口頭発言と対等な評価基準が公式資料で認められているか？" class="w-full rounded-xl border border-amber-300 p-3 text-xs sm:text-sm font-bold text-slate-800 focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] outline-none bg-white shadow-inner"></textarea>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <button type="button" onclick="copyFinalQuestion()" id="copyFinalBtn" class="w-full sm:w-auto px-6 py-2.5 rounded-xl accent-color-bg accent-hover text-white font-bold text-xs sm:text-sm shadow-sm smooth-transition flex items-center justify-center gap-2 active:scale-95">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+            <span>問いをコピーする</span>
+          </button>
+          <span class="text-[11px] text-slate-500 text-center sm:text-right">※次のSTEP 3（公式資料との照合）でこの問いを使います</span>
+        </div>
+      </section>
+
+      <!-- 4. 次の操作案内バナー -->
+      <section class="rounded-xl border-l-4 border-[#4A90E2] bg-blue-50/80 p-4 shadow-sm flex items-start gap-3">
+        <i data-lucide="info" class="w-5 h-5 main-color-text shrink-0 mt-0.5"></i>
+        <div class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+          <strong class="font-bold text-slate-800">次の操作：</strong>
+          最重要の問いが決まったら、ブラウザ上部の<strong>「×」ボタンでこのタブを閉じて</strong>授業ポータルに戻り、<strong>「STEP 3 公式資料と照合する」</strong>へ進んでください。
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==========================================
+      Footer
+  ========================================== -->
+  <footer class="mt-12 bg-slate-800 text-slate-400 py-5 text-center text-xs border-t border-slate-700">
+    <p>© 2026 鹿児島県立甲南高等学校 公民科</p>
+  </footer>
+
+  <!-- ==========================================
+      JavaScript Logic
+  ========================================== -->
+  <script>
+    'use strict';
+
+    const STORAGE_KEY = 'konan_lesson3_critique_v2';
+    let isRestoring = false;
+
+    function getVal(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function buildStartPrompt() {
+      const caseName = document.getElementById('caseSelect').value;
+      const ev = getVal('inputEvidence') || '（未入力）';
+      const rts = getVal('inputRoutes') || '（未入力）';
+      const unk = getVal('inputUnknown') || '（未入力）';
+      const per = getVal('inputPerson') || '（未入力）';
+
+      // ★高校生向けに言葉づかいをチューニングした開始プロンプト
+      const promptText = `あなたは、高校「公共」の授業で生徒たちの構想を問い直す対話のパートナーです。完成案や解決策は出さず、まず生徒の構想の「前提」を疑う質問を1つだけ投げかけてください。
+
+【担当ケース】${caseName}
+【公式資料で確認したこと】${ev}
+【班の構想】
+${rts}
+【資料だけでは判断できないこと】${unk}
+【本人との対話で確認すること】${per}
+
+【回答のルール】
+・高校生が班で話し合えるよう、難しい専門用語（保障、集約、規準など）を使わず、身近でわかりやすい日常の言葉で問いかけてください。
+・文末は「〜はどう考える？」「〜はどうなるかな？」など、話し合いの口火を切りやすい自然な問いかけにしてください。
+・ケースにない診断、健康状態、家庭環境は推測しないでください。
+・解決策や評価、まとめは絶対に示さないでください。
+・質問は1つだけ、80〜100字程度で簡潔にお願いします。`;
+
+      document.getElementById('prompt1Display').textContent = promptText;
+      if (!isRestoring) saveData();
+    }
+
+    function copyTurn2Prompt() {
+      const resp = getVal('responseTurn1') || '構想の実現を目指している';
+      // ★「反例・見落とされた立場」を平易な言葉でAIに指示
+      const text = `班の考えは「${resp}」です。これを受けて、「もしその案がうまくいかない場面」や「その方法だと困ってしまう人」を想像できるように、高校生向けの平易な言葉で問いを1つだけ投げかけてください。難しい言葉は使わず、解決策は示さないでください（80字以内）。`;
+      copyTextContent(text, 'copyBtn2', '2回目の返信文をコピー');
+    }
+
+    function copyTurn3Prompt() {
+      const resp = getVal('responseTurn2') || '提示された点も踏まえて検討中である';
+      // ★高校生がスライドに書きやすい言葉をAIに要求
+      const text = `班の考えは「${resp}」です。ここまでの対話を踏まえて、私たちが公式資料（国のガイドラインや学校の資料など）で確かめるべき「一番大切な問い」を1つに絞ってください。高校生が班スライドにそのまま書ける、短くすっきりした言葉（問い1文＋調べる観点1文、全体で120字以内）で示してください。`;
+      copyTextContent(text, 'copyBtn3', '3回目の返信文をコピー');
+    }
+
+    function updateCharCount() {
+      const q = document.getElementById('finalQuestion').value;
+      document.getElementById('charCount').textContent = `${q.length} / 80字`;
+      if (!isRestoring) saveData();
+    }
+
+    async function copyFinalQuestion() {
+      const q = getVal('finalQuestion');
+      if (!q) {
+        alert('最重要の問いを入力してください。');
+        return;
+      }
+      copyTextContent(`【第4時へ引き継ぐ最重要の問い】\n${q}`, 'copyFinalBtn', '問いをコピーする');
+    }
+
+    async function copyText(elementId, btnId) {
+      const text = document.getElementById(elementId).textContent;
+      copyTextContent(text, btnId, '開始プロンプトをコピー');
+    }
+
+    async function copyTextContent(text, btnId, defaultText) {
+      const btn = document.getElementById(btnId);
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i><span>コピー完了！</span>`;
+        btn.classList.add('bg-emerald-600');
+        setTimeout(() => {
+          btn.innerHTML = `<i data-lucide="copy" class="w-3.5 h-3.5"></i><span>${defaultText}</span>`;
+          btn.classList.remove('bg-emerald-600');
+          lucide.createIcons();
+        }, 1800);
+      } catch (e) {
+        alert('クリップボードへのコピーに失敗しました。');
+      }
+      lucide.createIcons();
+    }
+
+    function saveData() {
+      const data = {
+        caseSelect: document.getElementById('caseSelect').value,
+        inputEvidence: document.getElementById('inputEvidence').value,
+        inputRoutes: document.getElementById('inputRoutes').value,
+        inputUnknown: document.getElementById('inputUnknown').value,
+        inputPerson: document.getElementById('inputPerson').value,
+        responseTurn1: document.getElementById('responseTurn1').value,
+        responseTurn2: document.getElementById('responseTurn2').value,
+        finalQuestion: document.getElementById('finalQuestion').value
+      };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {}
+    }
+
+    function loadData() {
+      isRestoring = true;
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (saved) {
+          if (saved.caseSelect) document.getElementById('caseSelect').value = saved.caseSelect;
+          if (saved.inputEvidence) document.getElementById('inputEvidence').value = saved.inputEvidence;
+          if (saved.inputRoutes) document.getElementById('inputRoutes').value = saved.inputRoutes;
+          if (saved.inputUnknown) document.getElementById('inputUnknown').value = saved.inputUnknown;
+          if (saved.inputPerson) document.getElementById('inputPerson').value = saved.inputPerson;
+          if (saved.responseTurn1) document.getElementById('responseTurn1').value = saved.responseTurn1;
+          if (saved.responseTurn2) document.getElementById('responseTurn2').value = saved.responseTurn2;
+          if (saved.finalQuestion) document.getElementById('finalQuestion').value = saved.finalQuestion;
+        }
+      } catch (e) {
+      } finally {
+        isRestoring = false;
+      }
+      buildStartPrompt();
+      updateCharCount();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

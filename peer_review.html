@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>相互レビュー進行ガイド｜公共「AI時代のウェルビーイング」</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Noto Sans JP -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- 共通設定ファイル -->
+  <script src="portal-config.js"></script>
+  <style>
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background-color: #f8fafc;
+      color: #1f2937;
+    }
+    /* 甲南高校デザインシステム共通定義 */
+    .main-color-bg { background-color: #4A90E2; }
+    .main-color-text { color: #4A90E2; }
+    .accent-color-bg { background-color: #F5A623; }
+    .accent-color-text { color: #F5A623; }
+    .accent-hover:hover { background-color: #E0961F; }
+    .main-hover:hover { background-color: #3B7DC4; }
+
+    .smooth-transition {
+      transition: all 0.25s ease-in-out;
+    }
+
+    /* 班選択ボタンのアクティブ表示 */
+    .group-btn[aria-pressed="true"] {
+      border-color: #4A90E2 !important;
+      background-color: #eff6ff !important;
+      color: #1e40af !important;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25) !important;
+    }
+
+    /* タイマーのパルス演出 */
+    @keyframes timerPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .timer-alert {
+      animation: timerPulse 0.6s infinite;
+      color: #e11d48 !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased">
+
+  <!-- ==========================================
+      1. Navigation Header (甲南高校共通スタイル)
+  ========================================== -->
+  <header class="sticky top-0 z-40 main-color-bg text-white shadow-md">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center shadow-inner">
+          <i data-lucide="route" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span id="headerSubTitle" class="block text-xs font-semibold tracking-wider text-yellow-300">甲南高校79期生 公民科</span>
+          <span class="block font-bold text-sm sm:text-base leading-tight">相互レビュー進行ガイド</span>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-yellow-300"></i>
+        <span>第4時 STEP 4</span>
+      </span>
+    </div>
+  </header>
+
+  <!-- ==========================================
+      Main Content
+  ========================================== -->
+  <main class="flex-grow max-w-4xl mx-auto px-4 py-6 sm:py-8 w-full space-y-6">
+
+    <!-- 案内バナー -->
+    <div class="rounded-xl border-l-4 border-[#F5A623] bg-amber-50/80 p-4 shadow-sm flex items-start gap-3">
+      <i data-lucide="info" class="w-5 h-5 text-[#F5A623] shrink-0 mt-0.5"></i>
+      <p class="text-xs sm:text-sm font-bold text-amber-950 leading-relaxed">
+        このガイドは進行を支えます。各班の<strong>プレゼンター（1名）</strong>が自班の構想を説明するために他班へ移動します。机に残った班員は、説明に来た班のスライド（青い欄）へレビューを入力します。最終判断は、自班で行います。
+      </p>
+    </div>
+
+    <!-- ステップ進度インジケーター（新4ステップ） -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <div class="flex items-center justify-between text-xs font-black text-slate-500 mb-2">
+        <span id="stepIndicatorText">STEP 1 / 4</span>
+        <span id="stepNameText" class="main-color-text">説明に行く班・説明に来る班を確認する</span>
+      </div>
+      <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+        <div id="stepProgressBar" class="bg-gradient-to-r from-[#4A90E2] to-emerald-500 h-full rounded-full smooth-transition" style="width: 25%"></div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+        ステップカード群
+    ========================================== -->
+    <div id="stepCardsContainer" class="space-y-6">
+
+      <!-- STEP 1: 班と役割の確認（出張先＆受入先の左右提示） -->
+      <section id="step1Card" class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-7 shadow-sm smooth-transition">
+        <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+          <span class="w-8 h-8 rounded-full main-color-bg text-white flex items-center justify-center font-black text-sm">1</span>
+          <div>
+            <h2 class="text-lg sm:text-xl font-black text-slate-800">説明に行く班・説明に来る班を確認する</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">自分の班を選ぶと、プレゼンターの行き先と、迎える班が表示されます。</p>
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <span class="block text-xs font-bold text-slate-700 mb-2.5">あなたの班を選択してください：</span>
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
+            <button type="button" onclick="selectGroup(1)" class="group-btn py-3 rounded-xl border-2 border-slate-200 bg-white font-black text-sm hover:border-blue-400 smooth-transition" aria-pressed="false">1班</button>
+            <button type="button" onclick="selectGroup(2)" class="group-btn py-3 rounded-xl border-2 border-slate-200 bg-white font-black text-sm hover:border-blue-400 smooth-transition" aria-pressed="false">2班</button>
+            <button type="button" onclick="selectGroup(3)" class="group-btn py-3 rounded-xl border-2 border-slate-200 bg-white font-black text-sm hover:border-blue-400 smooth-transition" aria-pressed="false">3班</button>
+            <button type="button" onclick="selectGroup(4)" class="group-btn py-3 rounded-xl border-2 border-slate-200 bg-white font-black text-sm hover:border-blue-400 smooth-transition" aria-pressed="false">4班</button>
+            <button type="button" onclick="selectGroup(5)" class="group-btn py-3 rounded-xl border-2 border-slate-200 bg-white font-black text-sm hover:border-blue-400 smooth-transition" aria-pressed="false">5班</button>
+            <button type="button" onclick="selectGroup(6)" class="group-btn py-3 rounded-xl border-2 border-slate-200 bg-white font-black text-sm hover:border-blue-400 smooth-transition" aria-pressed="false">6班</button>
+          </div>
+        </div>
+
+        <!-- 役割・移動先ボックス（選択時に動的表示） -->
+        <div id="routeInfoBox" class="hidden mt-6 grid gap-4 sm:grid-cols-2">
+          <!-- 席を立つ人 -->
+          <div class="rounded-2xl border-2 border-amber-300 bg-amber-50/70 p-4 sm:p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-6 h-6 rounded-full accent-color-bg text-white text-xs font-black flex items-center justify-center">出</span>
+                <span class="text-xs font-black text-amber-900 uppercase tracking-wider">席を立つ人：プレゼンター（1名）</span>
+              </div>
+              <p class="text-sm font-bold text-slate-800 leading-snug">
+                あなたは <span id="outgoingDestText" class="text-lg font-black accent-color-text">○班</span> の席へ説明に行きます。
+              </p>
+              <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                自班の構想を説明し、質問に答えます。分からない質問は無理に答えず「この後、検討します」と回答してください。
+              </p>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-amber-200/80 text-[11px] font-bold text-amber-800">
+              ※タイマー管理と入力は訪問先にお任せでOK
+            </div>
+          </div>
+
+          <!-- 机に残る人 -->
+          <div class="rounded-2xl border-2 border-blue-300 bg-blue-50/70 p-4 sm:p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-6 h-6 rounded-full main-color-bg text-white text-xs font-black flex items-center justify-center">迎</span>
+                <span class="text-xs font-black text-blue-900 uppercase tracking-wider">机に残る人：他の班員（全員）</span>
+              </div>
+              <p class="text-sm font-bold text-slate-800 leading-snug">
+                <span id="incomingSrcText" class="text-lg font-black main-color-text">○班</span> のプレゼンターを迎えます。
+              </p>
+              <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                説明を聞き、問いをつくり、共同編集スライドの <span id="reviewTargetSlideText" class="font-bold text-blue-900">○班スライド（青い欄）</span> にレビューを入力します。
+              </p>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-blue-200/80 text-[11px] font-bold text-blue-800">
+              ※エディター・クリエイター・リサーチャー・タイムキーパーが協力
+            </div>
+          </div>
+        </div>
+
+        <!-- スライドリンク -->
+        <div class="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <a id="slideLink" href="#" target="konan_slides_tab" 
+             class="w-full sm:w-auto px-6 py-3 rounded-xl accent-color-bg accent-hover text-white font-bold text-xs sm:text-sm shadow-sm smooth-transition flex items-center justify-center gap-2 active:scale-95">
+            <i data-lucide="presentation" class="w-4 h-4"></i>
+            <span>スライドを開く</span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          </a>
+          <span class="text-[11px] text-slate-400 text-center sm:text-right">
+            ※すでにスライドを開いている人はそのままでOK（同じタブで開きます）
+          </span>
+        </div>
+      </section>
+
+      <!-- STEP 2: 説明を聞き、問いをつくる（統合ステップ：60秒タイマー＋2観点） -->
+      <section id="step2Card" class="hidden bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-7 shadow-sm smooth-transition">
+        <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+          <span class="w-8 h-8 rounded-full main-color-bg text-white flex items-center justify-center font-black text-sm">2</span>
+          <div>
+            <h2 class="text-lg sm:text-xl font-black text-slate-800">説明を聞き、問いをつくる</h2>
+            <p id="step2SubText" class="text-xs sm:text-sm text-slate-500 mt-0.5">
+              説明に来てくれたプレゼンターから構想を聞き、2つの観点で問いを考えます。
+            </p>
+          </div>
+        </div>
+
+        <!-- 60秒タイマーコンポーネント -->
+        <div class="mt-5 rounded-2xl border-2 border-blue-200 bg-blue-50/60 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-white text-[#4A90E2] flex items-center justify-center shadow-inner">
+              <i data-lucide="timer" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-blue-900 block">説明時間（タイムキーパー管理）</span>
+              <span id="timerDisplay" class="text-3xl font-black font-mono tracking-wider text-slate-800">01:00</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <button type="button" id="btnToggleTimer" onclick="toggleTimer()" 
+                    class="px-4 py-2.5 rounded-xl main-color-bg main-hover text-white font-bold text-xs shadow-sm smooth-transition flex items-center gap-1.5 active:scale-95">
+              <i data-lucide="play" class="w-4 h-4" id="timerIcon"></i>
+              <span id="timerBtnText">スタート</span>
+            </button>
+            <button type="button" onclick="resetTimer()" 
+                    class="px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs smooth-transition">
+              リセット
+            </button>
+          </div>
+        </div>
+
+        <!-- 2つの観点カード（左右並び） -->
+        <div class="mt-5 grid gap-4 sm:grid-cols-2">
+          <!-- 観点1 -->
+          <div class="rounded-2xl border-2 border-blue-200 bg-blue-50/50 p-4 sm:p-5">
+            <span class="inline-block rounded-full bg-blue-600 text-white text-[11px] font-bold px-2.5 py-0.5 mb-2">観点 ①</span>
+            <h3 class="font-bold text-sm sm:text-base text-blue-950 mb-1.5">エマの学びの充実</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              この構想によって、エマが実際に選べる学び方や、意思決定への参加の道は広がっているか。
+            </p>
+          </div>
+
+          <!-- 観点2 -->
+          <div class="rounded-2xl border-2 border-amber-200 bg-amber-50/50 p-4 sm:p-5">
+            <span class="inline-block rounded-full bg-amber-600 text-white text-[11px] font-bold px-2.5 py-0.5 mb-2">観点 ②</span>
+            <h3 class="font-bold text-sm sm:text-base text-amber-950 mb-1.5">それを支える教育環境</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              この仕組みは、特定の教員や班員の善意だけに頼らず、担当者が変わっても続けられる制度になっているか。
+            </p>
+          </div>
+        </div>
+
+        <!-- まとめる2点 -->
+        <div class="mt-5 rounded-xl border border-blue-200 bg-blue-50/70 p-4">
+          <strong class="text-xs font-bold text-blue-950 block mb-1">説明を聞いた班が考えること：</strong>
+          <ul class="text-xs sm:text-sm text-slate-700 space-y-1 list-disc pl-5">
+            <li>相手の構想で「維持したい点（価値）」を一つ</li>
+            <li>相手にもう一度考えてほしい「問い」を一つ</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- STEP 3: 説明に来た班のスライドへ入力する -->
+      <section id="step3Card" class="hidden bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-7 shadow-sm smooth-transition">
+        <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+          <span class="w-8 h-8 rounded-full main-color-bg text-white flex items-center justify-center font-black text-sm">3</span>
+          <div>
+            <h2 class="text-lg sm:text-xl font-black text-slate-800">説明に来た班のスライドへ入力する</h2>
+            <p id="step3SubText" class="text-xs sm:text-sm text-slate-500 mt-0.5">
+              クリエイターが説明に来た班のスライドを開き、青い欄に記入します。橙色の欄は変更しません。
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-5 space-y-4">
+          <div class="rounded-xl border-2 border-blue-300 bg-blue-50/40 p-4">
+            <span class="text-xs font-bold text-blue-900 block mb-1">入力 1 ｜ 維持したい点</span>
+            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+              ①学びの充実、②教育環境のどちらに価値があるかを具体的に書く。
+            </p>
+          </div>
+
+          <div class="rounded-xl border-2 border-blue-300 bg-blue-50/40 p-4">
+            <span class="text-xs font-bold text-blue-900 block mb-1">入力 2 ｜ もう一度考えてほしい問い</span>
+            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+              「選択肢は広がるか」「誰かの善意に頼らず続くか」を手がかりに、疑問文（問い）の形で書く。
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-5 p-4 rounded-xl border border-amber-200 bg-amber-50/70 text-xs sm:text-sm font-bold text-amber-950 flex items-center gap-2">
+          <i data-lucide="check" class="w-4 h-4 text-[#F5A623] shrink-0"></i>
+          <span>質疑が終わったら、プレゼンターは自班の席へ戻りましょう。</span>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-xs text-slate-400">※スライドは同じタブで作業を続けられます</span>
+          <a href="#" onclick="openSlideAgain(); return false;" class="text-xs font-bold text-[#4A90E2] hover:underline flex items-center gap-1">
+            <span>スライドをもう一度開く</span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+      </section>
+
+      <!-- STEP 4: 自班のレビューを判断する -->
+      <section id="step4Card" class="hidden bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-7 shadow-sm smooth-transition">
+        <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+          <span class="w-8 h-8 rounded-full accent-color-bg text-white flex items-center justify-center font-black text-sm">4</span>
+          <div>
+            <h2 class="text-lg sm:text-xl font-black text-slate-800">自班のレビューを判断する</h2>
+            <p id="step4SubText" class="text-xs sm:text-sm text-slate-500 mt-0.5">
+              自班スライドに届いたレビューを班で判断します。
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-5 rounded-2xl border-2 border-amber-300 bg-amber-50/70 p-4 sm:p-5">
+          <strong class="text-xs font-bold text-amber-950 block mb-2">自班スライドに記録すること：</strong>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center font-black text-xs sm:text-sm mb-3">
+            <span class="rounded-lg bg-white p-2.5 shadow-sm border border-amber-200 text-slate-800">採用</span>
+            <span class="rounded-lg bg-white p-2.5 shadow-sm border border-amber-200 text-slate-800">修正</span>
+            <span class="rounded-lg bg-white p-2.5 shadow-sm border border-amber-200 text-slate-800">保留</span>
+            <span class="rounded-lg bg-white p-2.5 shadow-sm border border-amber-200 text-slate-800">不採用</span>
+          </div>
+          <p class="text-xs text-slate-700 leading-relaxed">
+            判断の理由、変更したこと、そして<strong>「本人との実際の対話まで保留すること」</strong>を記録します。
+          </p>
+        </div>
+
+        <div class="mt-5 space-y-2">
+          <span class="text-xs font-bold text-slate-700 block">判断の約束：</span>
+          <div class="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+            <span>他班の問いを受け入れること自体を目標にしない（自分たちで吟味する）。</span>
+          </div>
+          <div class="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+            <span>ケース資料と公式資料、自班の構想に照らして判断する。</span>
+          </div>
+          <div class="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+            <span>エマ本人が具体的に選ぶことを、班だけで決めつけない。</span>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-slate-100 rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-xs sm:text-sm font-bold text-emerald-950 flex items-center gap-2">
+          <i data-lucide="check" class="w-5 h-5 text-emerald-600 shrink-0"></i>
+          <span>判断が終わったらタブを閉じてポータルに戻ってください。</span>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- コントロールボタン（前へ／次へ） -->
+    <div class="flex items-center justify-between gap-3 pt-4">
+      <button type="button" id="btnPrev" onclick="navigateStep(-1)" disabled
+              class="px-5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-600 font-bold text-xs sm:text-sm smooth-transition disabled:opacity-40 disabled:cursor-not-allowed">
+        前へ
+      </button>
+
+      <button type="button" id="btnNext" onclick="navigateStep(1)"
+              class="px-6 py-2.5 rounded-xl main-color-bg main-hover text-white font-bold text-xs sm:text-sm shadow-sm smooth-transition active:scale-95">
+        次へ進む
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ==========================================
+      Footer (甲南高校共通スタイル)
+  ========================================== -->
+  <footer class="mt-12 bg-slate-800 text-slate-400 py-5 text-center text-xs border-t border-slate-700">
+    <p>© 2026 鹿児島県立甲南高等学校 公民科</p>
+  </footer>
+
+  <!-- ==========================================
+      JavaScript Logic
+  ========================================== -->
+  <script>
+    'use strict';
+
+    // ステップ定義（新4ステップ）
+    const STEP_NAMES = [
+      "説明に行く班・説明に来る班を確認する",
+      "説明を聞き、問いをつくる",
+      "説明に来た班のスライドへ入力する",
+      "自班のレビューを判断する"
+    ];
+
+    let currentStep = 1;
+    let selectedGroup = null;
+
+    // スライドURLの解決（portal-config.js の slidesLesson4 を確実に取得）
+    function resolveSlideUrl() {
+      const cfg = window.PORTAL_CONFIG || {};
+      return cfg.slidesLesson4 || cfg.slides?.lesson4 || '#';
+    }
+
+    // 班の選択（出張先・受入先・入力先を自動計算）
+    function selectGroup(groupNum) {
+      selectedGroup = groupNum;
+
+      // 循環ルールの計算
+      // 1. 迎えるプレゼンター（説明に来る班）: 自班 + 1（6班は1班）
+      const incomingGroup = (groupNum % 6) + 1;
+      // 2. 出張先（自班プレゼンターが説明に行く班）: 自班 - 1（1班は6班）
+      const outgoingGroup = groupNum === 1 ? 6 : groupNum - 1;
+
+      // ボタンの選択状態更新
+      document.querySelectorAll('.group-btn').forEach((btn, idx) => {
+        const isCurrent = (idx + 1) === groupNum;
+        btn.setAttribute('aria-pressed', isCurrent ? 'true' : 'false');
+      });
+
+      // 表示の動的更新
+      document.getElementById('outgoingDestText').textContent = `${outgoingGroup}班`;
+      document.getElementById('incomingSrcText').textContent = `${incomingGroup}班`;
+      document.getElementById('reviewTargetSlideText').textContent = `${incomingGroup}班スライド（青い欄）`;
+      document.getElementById('routeInfoBox').classList.remove('hidden');
+
+      // 後続ステップの文言も分かりやすくカスタマイズ
+      document.getElementById('step2SubText').textContent = 
+        `説明に来てくれた【${incomingGroup}班】のプレゼンターから構想を聞き、2つの観点で問いを考えます。`;
+      document.getElementById('step3SubText').textContent = 
+        `クリエイターが【${incomingGroup}班】のスライドを開き、青い欄に記入します。橙色の欄は変更しません。`;
+      document.getElementById('step4SubText').textContent = 
+        `プレゼンターが戻った後、自班（${groupNum}班）スライドに【${outgoingGroup}班】から届いたレビューを班全員で判断します。`;
+
+      // スライドURLの注入
+      const slideUrl = resolveSlideUrl();
+      const link = document.getElementById('slideLink');
+      if (link) {
+        link.href = slideUrl;
+        if (slideUrl === '#') {
+          link.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+          link.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+      }
+    }
+
+    function openSlideAgain() {
+      const slideUrl = resolveSlideUrl();
+      if (slideUrl && slideUrl !== '#') {
+        window.open(slideUrl, 'konan_slides_tab');
+      } else {
+        alert('GoogleスライドのURLが未設定です。授業ポータルから開いてください。');
+      }
+    }
+
+    // ステップ遷移
+    function navigateStep(direction) {
+      if (currentStep === 1 && direction === 1 && !selectedGroup) {
+        alert('先にあなたの班を選択してください。');
+        return;
+      }
+
+      const nextStep = currentStep + direction;
+      if (nextStep < 1) return;
+
+      if (nextStep > 4) {
+        alert('相互レビューの進行は完了です！タブを閉じてポータルに戻り、「STEP 6 個人で振り返る」に進んでください。');
+        return;
+      }
+
+      currentStep = nextStep;
+      renderStep();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderStep() {
+      // カードの表示切り替え（全4ステップ）
+      for (let i = 1; i <= 4; i++) {
+        const card = document.getElementById(`step${i}Card`);
+        if (card) {
+          card.classList.toggle('hidden', i !== currentStep);
+        }
+      }
+
+      // プログレスバー・インジケーター更新
+      document.getElementById('stepIndicatorText').textContent = `STEP ${currentStep} / 4`;
+      document.getElementById('stepNameText').textContent = STEP_NAMES[currentStep - 1];
+      document.getElementById('stepProgressBar').style.width = `${(currentStep / 4) * 100}%`;
+
+      // ボタン制御
+      document.getElementById('btnPrev').disabled = (currentStep === 1);
+      const nextBtn = document.getElementById('btnNext');
+      if (currentStep === 4) {
+        nextBtn.textContent = '完了する';
+        nextBtn.className = 'px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-sm smooth-transition active:scale-95';
+      } else {
+        nextBtn.textContent = '次へ進む';
+        nextBtn.className = 'px-6 py-2.5 rounded-xl main-color-bg main-hover text-white font-bold text-xs sm:text-sm shadow-sm smooth-transition active:scale-95';
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // ==========================================
+    // タイマー機能（60秒カウントダウン ＋ 音声チャイム）
+    // ==========================================
+    let timerDuration = 60;
+    let timerRemaining = 60;
+    let timerInterval = null;
+
+    function updateTimerDisplay() {
+      const display = document.getElementById('timerDisplay');
+      const minutes = String(Math.floor(timerRemaining / 60)).padStart(2, '0');
+      const seconds = String(timerRemaining % 60).padStart(2, '0');
+      display.textContent = `${minutes}:${seconds}`;
+
+      if (timerRemaining <= 10 && timerRemaining > 0) {
+        display.classList.add('text-rose-600', 'timer-alert');
+      } else {
+        display.classList.remove('text-rose-600', 'timer-alert');
+      }
+    }
+
+    function toggleTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        document.getElementById('timerBtnText').textContent = '再開';
+        document.getElementById('timerIcon').setAttribute('data-lucide', 'play');
+      } else {
+        if (timerRemaining <= 0) timerRemaining = timerDuration;
+        document.getElementById('timerBtnText').textContent = '一時停止';
+        document.getElementById('timerIcon').setAttribute('data-lucide', 'pause');
+
+        timerInterval = setInterval(() => {
+          if (timerRemaining > 0) {
+            timerRemaining--;
+            updateTimerDisplay();
+          } else {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            document.getElementById('timerBtnText').textContent = 'スタート';
+            document.getElementById('timerIcon').setAttribute('data-lucide', 'play');
+            playChime();
+            alert('⏰ 60秒が経過しました！質問・問いかけに移ってください。');
+          }
+        }, 1000);
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function resetTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      timerRemaining = timerDuration;
+      updateTimerDisplay();
+      document.getElementById('timerBtnText').textContent = 'スタート';
+      document.getElementById('timerIcon').setAttribute('data-lucide', 'play');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // 終了チャイム音（Web Audio API）
+    function playChime() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.8);
+      } catch (e) {}
+    }
+
+    // 初期化
+    document.addEventListener('DOMContentLoaded', () => {
+      // クラス名をヘッダーに反映（確認用）
+      if (window.PORTAL_CONFIG && window.PORTAL_CONFIG.className) {
+        const subTitle = document.getElementById('headerSubTitle');
+        if (subTitle) subTitle.textContent = `甲南高校${window.PORTAL_CONFIG.className} 公民科`;
+      }
+
+      // クラス別スライドURLの設定
+      const link = document.getElementById('slideLink');
+      if (link) {
+        const slideUrl = resolveSlideUrl();
+        link.href = slideUrl;
+        if (!slideUrl || slideUrl === '#') {
+          link.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+          link.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+      }
+
+      renderStep();
+      updateTimerDisplay();
+    });
+  </script>
+</body>
+</html>
